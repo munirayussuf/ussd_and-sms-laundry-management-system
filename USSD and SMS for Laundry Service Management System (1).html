@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>USSD and SMS for Laundry Service Management System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#e3edef;--ink:#10303a;--mute:#4d6a73;--card:#f6fafb;--line:#c3d5da;--acc:#1b8f5f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0f1f25;--ink:#e2eef1;--mute:#93aeb6;--card:#162a31;--line:#2a4650;--acc:#4cc58f}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0f1f25;--ink:#e2eef1;--mute:#93aeb6;--card:#162a31;--line:#2a4650;--acc:#4cc58f}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "DM Sans",system-ui,sans-serif}
+[hidden]{display:none!important}
+header{max-width:1100px;margin:0 auto;padding:32px 20px 8px}
+h1{max-width:26ch;font:700 clamp(28px,5vw,46px)/1.1 "Bricolage Grotesque","DM Sans",sans-serif;margin:0 0 8px}
+header p{margin:0;max-width:56ch;color:var(--mute)}
+main{max-width:1100px;margin:0 auto;padding:20px;display:flex;flex-wrap:wrap;gap:28px;justify-content:center;align-items:flex-start}
+.side{flex:1 1 260px;max-width:360px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.side h2{font:700 18px "Bricolage Grotesque","DM Sans",sans-serif;margin:0 0 10px}
+.side ul{margin:0;padding-left:18px}.side li{margin-bottom:8px}
+#log{list-style:none;padding:0;max-height:300px;overflow:auto;font-size:14px}
+#log li{border-left:3px solid var(--acc);padding-left:10px;margin-bottom:8px}
+#log time{color:var(--mute);margin-right:6px}
+.panel{flex:1 1 100%;max-width:1060px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.panel h2{font:700 18px "Bricolage Grotesque","DM Sans",sans-serif;margin:0 0 12px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:14px}
+.stats div{border:1px solid var(--line);border-radius:10px;padding:8px 12px}.stats b{display:block;font-size:22px}.stats span{color:var(--mute);font-size:13px}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}th{color:var(--mute);font-weight:500}
+#adv{margin-top:12px;width:100%;padding:10px;border:0;border-radius:10px;background:var(--acc);color:#fff;font:700 15px "DM Sans",sans-serif;cursor:pointer}
+#adv:disabled{opacity:.45;cursor:not-allowed}
+.phone{order:-1;width:340px;max-width:100%;background:#0b2229;border-radius:42px;padding:11px}
+.screen{position:relative;height:640px;background:#fff;color:#111;border-radius:32px;overflow:hidden;display:flex;flex-direction:column;font-family:Roboto,"DM Sans",system-ui,sans-serif}
+.status{display:flex;justify-content:space-between;padding:10px 20px 4px;font-size:12px;color:#444}
+.app{flex:1;display:flex;flex-direction:column;min-height:0}
+#num{border:0;text-align:center;font-size:30px;padding:36px 12px 22px;background:none;color:#111;width:100%;outline:none}
+.hint{text-align:center;font-size:13px;color:#667;margin-bottom:8px}
+#chip{display:block;margin:0 auto 14px;border:1px solid #1b8f5f;color:#136b47;background:#eaf7f0;border-radius:20px;padding:5px 14px;font-size:13px;cursor:pointer}
+.pad{display:grid;grid-template-columns:repeat(3,68px);gap:12px;justify-content:center}
+.pad button{height:68px;border-radius:50%;border:0;background:#eef1f2;font-size:26px;cursor:pointer}
+.pad button:active{background:#d8dfe1}
+.row{display:grid;grid-template-columns:repeat(3,68px);gap:12px;justify-content:center;margin-top:12px}
+#call{grid-column:2;height:68px;border-radius:50%;border:0;background:#1b8f5f;color:#fff;font-size:14px;font-weight:700;cursor:pointer}
+#del{grid-column:3;border:0;background:none;font-size:24px;cursor:pointer;color:#555}
+button:focus-visible,input:focus-visible{outline:3px solid #f0a500;outline-offset:2px}
+.tabs{display:flex;border-top:1px solid #dde3e5}
+.tabs button{flex:1;padding:12px;border:0;background:#fff;font-size:14px;color:#556;cursor:pointer}
+.tabs .on{color:#136b47;font-weight:700;box-shadow:inset 0 -3px #1b8f5f}
+#bdg{background:#d33;color:#fff;border-radius:10px;padding:0 6px;font-size:11px;margin-left:4px}
+.mh{padding:14px 16px;font-weight:700;font-size:18px;border-bottom:1px solid #e3e8ea}
+#thread{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.b{max-width:84%;padding:8px 12px;border-radius:14px;font-size:14px;line-height:1.4;white-space:pre-wrap;background:#eef1f2}
+.b small{display:block;color:#667;font-size:11px;margin-bottom:2px}
+.b.me{align-self:flex-end;background:#d4f0e2}
+.empty{color:#778;font-size:14px;text-align:center;margin-top:30px}
+.seg{display:flex;gap:6px;padding:8px 12px 0}.seg button{flex:1;border:1px solid #cbd3d6;background:#fff;border-radius:16px;padding:6px 4px;font-size:12px;color:#445;cursor:pointer}.seg .on{background:#d4f0e2;border-color:#1b8f5f;color:#0f5a3a;font-weight:700}
+.comp{display:flex;gap:8px;padding:8px;border-top:1px solid #e3e8ea}
+.comp input{flex:1;border:1px solid #cbd3d6;border-radius:20px;padding:9px 14px;font-size:14px}
+.comp button{border:0;background:#1b8f5f;color:#fff;border-radius:20px;padding:0 16px;font-weight:700;cursor:pointer}
+.dlg{position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:18px}
+.card{background:#fff;border-radius:6px;padding:20px 20px 8px;width:100%;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+#dt{margin:0 0 12px;white-space:pre-wrap;font:15px/1.5 Roboto,"DM Sans",system-ui,sans-serif;max-height:340px;overflow:auto}
+#di{width:100%;border:0;border-bottom:2px solid #1b8f5f;font-size:18px;padding:4px 0;outline:none;background:none;color:#111}
+.btns{display:flex;justify-content:flex-end;gap:6px;margin-top:8px}
+.btns button{border:0;background:none;color:#136b47;font-weight:700;font-size:15px;padding:10px 14px;cursor:pointer}
+@media (max-width:420px){.screen{height:600px}}
+</style>
+</head>
+<body>
+<header>
+<h1>USSD and SMS for Laundry Service Management System</h1>
+<p>Book laundry from any phone, no internet needed. Dial the code or send an SMS, the same way Safaricom services work. Works for formal laundries and for mama fua.</p>
+</header>
+<main>
+<section class="side" hidden>
+<h2>Try it</h2>
+<ul>
+<li>Formal laundry: dial *123#, press 1, then pick a laundry, a service and the kilos.</li>
+<li>Mama fua: dial *123#, press 2, then pick your area and a mama fua.</li>
+<li>SMS: open Messages and text HELP to 22123.</li>
+<li>Provider side: in Messages, switch to Provider phone and text ACCEPT LD1001, READY LD1001 or DONE LD1001.</li>
+<li>Press 0 on any screen to go back.</li>
+</ul>
+</section>
+
+<div class="phone"><div class="screen">
+<div class="status"><span id="clk"></span><span>Safaricom 4G</span></div>
+<div id="dial" class="app">
+<input id="num" readonly placeholder="Enter number" aria-label="Number to dial">
+<div class="pad" id="pad"></div>
+<div class="row"><button id="call" aria-label="Call">Call</button><button id="del" aria-label="Delete">&#9003;</button></div>
+</div>
+<div id="msgs" class="app" hidden>
+<div class="mh">Messages</div>
+<div class="seg"><button data-b="c" class="on">Customer phone</button><button data-b="p">Provider phone</button></div>
+<div id="thread"><p class="empty">No messages yet. Text HELP to 22123.</p></div>
+<div class="comp"><input id="si" placeholder="Text 22123" aria-label="Message to 22123"><button id="ss">Send</button></div>
+</div>
+<nav class="tabs"><button data-t="dial" class="on">Phone</button><button data-t="msgs">Messages<b id="bdg" hidden>0</b></button></nav>
+<div id="dlg" class="dlg" hidden><div class="card" role="dialog" aria-live="polite">
+<pre id="dt"></pre>
+<input id="di" inputmode="numeric" autocomplete="off" aria-label="Your reply">
+<div class="btns"><button id="dc">Cancel</button><button id="ds">Send</button></div>
+</div></div>
+</div></div>
+
+<section class="side" hidden>
+<h2>Behind the scenes</h2>
+<ul id="log"><li><time></time>Waiting for the first request.</li></ul>
+<button id="adv" disabled>Provider: advance latest order</button>
+</section>
+<section class="panel">
+<h2>Admin panel</h2>
+<div class="stats" id="stats"></div>
+<div class="tw"><table id="tbl"><thead><tr><th>Order</th><th>Channel</th><th>Type</th><th>Provider</th><th>Service</th><th>Total (KES)</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+</section>
+</main>
+
+<script>
+const $=s=>document.querySelector(s);
+const clock=()=>new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+const FP=[["CleanPro Laundromat","Nakuru Town"],["Spotless Dry Cleaners","Milimani"],["Fresh Press Laundry","Section 58"]];
+const FS=[["Wash & fold",150,"kg"],["Wash & iron",200,"kg"],["Dry cleaning",400,"item"]];
+const MF={"Section 58":["Mama Wanjiru","Mama Akinyi","Mama Fatuma"],"Milimani":["Mama Njeri","Mama Achieng"],"Free Area":["Mama Halima","Mama Wambui"],"Shabab":["Mama Chebet","Mama Amina"]};
+const AR=Object.keys(MF),LD=[["Small basin",100],["Medium basin",200],["Large basin",300]],ST=["Received","Accepted","Washing","Ready for delivery","Delivered"];
+let orders=[],d={},hist=[],cur=null,box="c",U={c:0,p:0},nid=1001,M=[];
+const num=(i,n)=>/^\d{1,2}$/.test(i)&&+i>=1&&+i<=n?+i:0;
+const lst=a=>a.map((x,i)=>`${i+1}. ${x}`).join("\n");
+const unit=(q,u)=>u==="kg"?q+" kg":q+" item"+(q>1?"s":"");
+
+function log(t){const li=document.createElement("li"),tm=document.createElement("time");tm.textContent=clock();li.append(tm,t);const l=$("#log");if(l.children.length===1&&!l.firstChild.textContent.match(/\d{2}:\d{2}/))l.innerHTML="";l.prepend(li)}
+function sms(from,text,me,b="c"){M.push({from,text,me,t:clock(),b});if(!me&&($("#msgs").hidden||box!==b)){U[b]++;badges()}drawSms()}
+function badges(){const n=U.c+U.p;$("#bdg").textContent=n;$("#bdg").hidden=!n;document.querySelectorAll(".seg button").forEach(x=>{const k=x.dataset.b;x.textContent=(k==="c"?"Customer phone":"Provider phone")+(U[k]?` (${U[k]})`:"")})}
+function drawSms(){const th=$("#thread"),L=M.filter(m=>m.b===box);th.innerHTML="";if(!L.length){const p=document.createElement("p");p.className="empty";p.textContent=box==="c"?"No messages yet. Text HELP to 22123.":"No messages yet. New requests arrive here. Text HELP for commands.";th.append(p)}
+ L.forEach(m=>{const b=document.createElement("div"),s=document.createElement("small");b.className="b"+(m.me?" me":"");s.textContent=m.me?"You, "+m.t:m.from+", "+m.t;b.append(s,m.text);th.append(b)});th.scrollTop=th.scrollHeight}
+function refreshAdv(){$("#adv").disabled=!orders.some(o=>o.status!=="Delivered"&&o.status!=="Cancelled");renderPanel()}
+function renderPanel(){const by=f=>orders.filter(f).length;
+ $("#stats").innerHTML=[["Orders",orders.length],["By USSD",by(o=>o.ch==="USSD")],["By SMS",by(o=>o.ch==="SMS")],["Formal",by(o=>o.kind==="Formal")],["Mama Fua",by(o=>o.kind==="Mama Fua")],["Value (KES)",orders.filter(o=>o.status!=="Cancelled").reduce((a,o)=>a+o.total,0)]].map(x=>`<div><b>${x[1]}</b><span>${x[0]}</span></div>`).join("");
+ $("#tbl tbody").innerHTML=orders.length?[...orders].reverse().map(o=>`<tr><td>${o.id}</td><td>${o.ch}</td><td>${o.kind}</td><td>${o.prov}</td><td>${o.desc}</td><td>${o.total}</td><td>${o.status}</td></tr>`).join(""):'<tr><td colspan="7">No orders yet. Place one from the phone.</td></tr>'}
+function mk(ch,x){const o={id:"LD"+nid++,prov:x.prov,desc:x.desc,total:x.base+x.fee,kind:x.kind,status:ST[0],ch};orders.push(o);
+ log(`createOrder() saved ${o.id} from ${ch} (${o.kind})`);
+ sms("SAFIFUA",`Order ${o.id} confirmed: ${o.desc} with ${o.prov}. Total KES ${o.total}, pay by M-Pesa on delivery. Track it: dial *123# then 3, or text STATUS ${o.id} to 22123.`);
+ log(`sendSms() to customer, order ${o.id}`);log(`sendSms() to ${o.prov}: new ${o.kind} request`);sms("SAFIFUA",`New request ${o.id}: ${o.desc}, KES ${o.total}. Reply ACCEPT ${o.id} when you can take it.`,0,"p");refreshAdv();return o}
+
+const way=(fee)=>({t:()=>`Collection\n1. Pick-up from me (+KES ${fee})\n2. I’ll drop off\n0. Back`,n:i=>{const k=num(i,2);if(!k)return;d.fee=k==1?fee:0;d.way=k==1?"pick-up":"drop-off";return"confirm"}});
+const S={
+main:{t:()=>"Laundry Service Management System\n"+lst(["Formal laundry","Mama Fua (informal)","Track my order","Help"]),n:i=>[0,"fProv","iArea","track","help"][num(i,4)]},
+fProv:{t:()=>"Formal laundries\n"+lst(FP.map(p=>`${p[0]}, ${p[1]}`))+"\n0. Back",n:i=>{const k=num(i,3);if(!k)return;d={kind:"Formal",prov:FP[k-1][0]};return"fSvc"}},
+fSvc:{t:()=>d.prov+"\n"+lst(FS.map(s=>`${s[0]} KES ${s[1]}/${s[2]}`))+"\n0. Back",n:i=>{const k=num(i,3);if(!k)return;d.svc=FS[k-1];return"fQty"}},
+fQty:{t:()=>`How many ${d.svc[2]==="kg"?"kg":"items"}? (1-50)\n0. Back`,n:i=>{const q=num(i,50);if(!q)return;d.base=q*d.svc[1];d.desc=`${d.svc[0]}, ${unit(q,d.svc[2])}`;return"fWay"}},
+fWay:way(100),
+iArea:{t:()=>"Your area\n"+lst(AR)+"\n0. Back",n:i=>{const k=num(i,AR.length);if(!k)return;d={kind:"Mama Fua",area:AR[k-1]};return"iProv"}},
+iProv:{t:()=>`Mama Fua in ${d.area}\n`+lst(MF[d.area])+"\n0. Back",n:i=>{const k=num(i,MF[d.area].length);if(!k)return;d.prov=MF[d.area][k-1];return"iLoad"}},
+iLoad:{t:()=>d.prov+"\n"+lst(LD.map(l=>`${l[0]} KES ${l[1]}`))+"\n0. Back",n:i=>{const k=num(i,3);if(!k)return;d.base=LD[k-1][1];d.desc=LD[k-1][0];return"iWay"}},
+iWay:way(50),
+confirm:{t:()=>`Confirm order\n${d.prov}\n${d.desc}\nCollection: ${d.way}\nTotal KES ${d.base+d.fee}\n1. Confirm\n2. Cancel`,n:i=>[0,"done","cancel"][num(i,2)]},
+done:{end:1,fx:()=>{d.o=mk("USSD",d)},t:()=>`Order ${d.o.id} received. ${d.prov} will confirm shortly. Pay KES ${d.o.total} by M-Pesa on delivery. Details sent by SMS.`},
+cancel:{end:1,t:()=>"Order cancelled. Dial *123# to start again."},
+help:{end:1,t:()=>"Help: call 0700 123 456 or text HELP to 22123."},
+track:{t:()=>"Enter your order number (for example LD1001)",err:"Order not found.",n:i=>{const o=orders.find(x=>x.id===i.toUpperCase().replace("#",""));if(!o)return;d.q=o;return"trackRes"}},
+trackRes:{end:1,t:()=>{const o=d.q;return`Order ${o.id}\n${o.prov}\n${o.desc}\nStatus: ${o.status}\nTotal KES ${o.total}`}},
+x:{end:1,t:()=>"Connection problem or invalid MMI code."}
+};
+
+function show(state,pre){cur=state;const s=S[state];if(s.end&&s.fx)s.fx();
+ $("#dt").textContent=(pre?pre+"\n":"")+s.t();$("#dlg").hidden=false;
+ const i=$("#di");i.hidden=!!s.end;i.value="";$("#ds").hidden=!!s.end;$("#dc").textContent=s.end?"OK":"Cancel";
+ s.end?$("#dc").focus():i.focus()}
+function send(){const v=$("#di").value.trim(),s=S[cur];
+ if(v==="0"&&hist.length)return show(hist.pop());
+ const r=s.n(v);if(!r)return show(cur,s.err||"Invalid input.");
+ hist.push(cur);show(r)}
+function closeDlg(){$("#dlg").hidden=true;cur=null;hist=[]}
+function dialNow(){const n=$("#num").value;
+ if(n==="*123#"){d={};hist=[];log("ussdRouter: new session on *123#");show("main")}
+ else show("x")}
+$("#call").onclick=dialNow;$("#ds").onclick=send;$("#dc").onclick=closeDlg;
+$("#di").onkeydown=e=>{if(e.key==="Enter")send()};
+
+$("#del").onclick=()=>{const n=$("#num");n.value=n.value.slice(0,-1)};
+"123456789*0#".split("").forEach(k=>{const b=document.createElement("button");b.textContent=k;b.onclick=()=>{$("#num").value+=k};$("#pad").append(b)});
+document.addEventListener("keydown",e=>{if($("#dlg").hidden&&!$("#dial").hidden&&document.activeElement.tagName!=="INPUT"){
+ if(/^[0-9*#]$/.test(e.key))$("#num").value+=e.key;else if(e.key==="Backspace")$("#del").click();else if(e.key==="Enter")dialNow()}});
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
+ document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x===b));
+ $("#dial").hidden=b.dataset.t!=="dial";$("#msgs").hidden=b.dataset.t!=="msgs";
+ if(b.dataset.t==="msgs"){U[box]=0;badges();drawSms()}});
+document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{box=b.dataset.b;U[box]=0;document.querySelectorAll(".seg button").forEach(x=>x.classList.toggle("on",x===b));badges();drawSms()});
+
+function reply(t){const w=t.trim().toUpperCase().split(/\s+/),c=w[0];
+ if(c==="HELP")return"Laundry SMS commands:\nPRICES\nSTATUS LD1001\nCANCEL LD1001\nBOOK MAMA <AREA> <SMALL|MEDIUM|LARGE>\nBOOK FORMAL <WASH|IRON|DRY> <QTY>\nOr dial *123#.";
+ if(c==="PRICES")return"Formal: wash & fold KES 150/kg, wash & iron KES 200/kg, dry cleaning KES 400/item. Mama Fua: small basin KES 100, medium KES 200, large KES 300.";
+ if(c==="STATUS"||c==="CANCEL"){const o=orders.find(x=>x.id===w[1]);if(!o)return"Order not found. Check the number and try again.";
+  if(c==="STATUS")return`Order ${o.id}: ${o.status}. ${o.desc} with ${o.prov}. Total KES ${o.total}.`;
+  if(o.status!=="Received")return`Order ${o.id} is already ${o.status} and cannot be cancelled.`;
+  o.status="Cancelled";log(`updateOrderStatus() ${o.id} cancelled`);refreshAdv();return`Order ${o.id} cancelled.`}
+ if(c==="BOOK"&&w[1]==="MAMA"){const sz=["SMALL","MEDIUM","LARGE"].indexOf(w[w.length-1]),ar=AR.find(a=>a.toUpperCase()===w.slice(2,-1).join(" "));
+  if(sz<0||!ar)return"Could not read that. Example: BOOK MAMA MILIMANI MEDIUM";
+  mk("SMS",{kind:"Mama Fua",prov:MF[ar][0],desc:LD[sz][0]+", pick-up included",base:LD[sz][1],fee:50});return null}
+ if(c==="BOOK"&&w[1]==="FORMAL"){const i=["WASH","IRON","DRY"].indexOf(w[2]),q=num(w[3]||"",50);
+  if(i<0||!q)return"Could not read that. Example: BOOK FORMAL WASH 5";
+  mk("SMS",{kind:"Formal",prov:FP[0][0],desc:`${FS[i][0]}, ${unit(q,FS[i][2])}, pick-up included`,base:q*FS[i][1],fee:100});return null}
+ return"Sorry, we did not understand that. Text HELP to 22123 for commands."}
+function preply(t){const w=t.trim().toUpperCase().split(/\s+/),c=w[0],o=orders.find(x=>x.id===w[1]);
+ if(c==="HELP")return"Provider commands:\nACCEPT LD1001\nREADY LD1001\nDONE LD1001";
+ const R={ACCEPT:[["Received"],"Accepted"],READY:[["Accepted","Washing"],"Ready for delivery"],DONE:[["Ready for delivery"],"Delivered"]}[c];
+ if(!R)return"Sorry, we did not understand that. Text HELP for provider commands.";
+ if(!o)return"Order not found. Check the number and try again.";
+ if(!R[0].includes(o.status))return`Order ${o.id} is ${o.status}, so ${c} does not apply now.`;
+ o.status=R[1];log(`updateOrderStatus() ${o.id} set to ${o.status} by provider SMS`);log(`onOrderStatusChange() ${o.id} is now ${o.status}`);
+ sms("SAFIFUA",`Order ${o.id} update: ${o.status}.`+(o.status==="Ready for delivery"?" Your laundry is on its way.":""));
+ log(`sendSms() to customer, order ${o.id}`);refreshAdv();return`Thanks. ${o.id} is now ${o.status}.`}
+function inbound(){const i=$("#si"),t=i.value.trim();if(!t)return;i.value="";const b=box;sms("You",t,1,b);log(`SMS received on 22123 from ${b==="p"?"provider":"customer"}: ${t.slice(0,28)}`);
+ setTimeout(()=>{const r=b==="p"?preply(t):reply(t);if(r)sms("SAFIFUA",r,0,b)},500)}
+$("#ss").onclick=inbound;$("#si").onkeydown=e=>{if(e.key==="Enter")inbound()};
+
+$("#adv").onclick=()=>{const o=[...orders].reverse().find(x=>x.status!=="Delivered"&&x.status!=="Cancelled");if(!o)return;
+ o.status=ST[ST.indexOf(o.status)+1];log(`onOrderStatusChange() ${o.id} is now ${o.status}`);
+ sms("SAFIFUA",`Order ${o.id} update: ${o.status}.`+(o.status==="Ready for delivery"?" Your laundry is on its way.":""));
+ log(`sendSms() to customer, order ${o.id}`);refreshAdv()};
+renderPanel();$("#clk").textContent=clock();setInterval(()=>$("#clk").textContent=clock(),30000);
+</script>
+</body>
+</html>
