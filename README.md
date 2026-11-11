@@ -1,6 +1,4 @@
-# ussd_and-sms-laundry-management-system
 # USSD and SMS for Laundry Service Management System
-
 ## Project Overview
 
 The USSD and SMS Laundry Service Management System is a digital solution designed to make laundry services more accessible to customers using both formal laundry businesses and informal laundry providers (Mama Fua).
